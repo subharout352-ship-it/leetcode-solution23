@@ -1,0 +1,58 @@
+class Solution(object):
+
+    def maxSumSubmatrix(self, matrix, k):
+        """
+        :type matrix: List[List[int]]
+        :type k: int
+        :rtype: int
+        """
+        rows = len(matrix)
+        cols = len(matrix[0])
+
+        # Make cols the smaller dimension
+        if rows > cols:
+            matrix = [list(x) for x in zip(*matrix)]
+            rows, cols = cols, rows
+
+        result = float('-inf')
+
+        for left in range(cols):
+            row_sum = [0] * rows
+
+            for right in range(left, cols):
+                for r in range(rows):
+                    row_sum[r] += matrix[r][right]
+
+                # Find maximum subarray sum <= k
+                prefix = [0]
+                current = 0
+
+                for value in row_sum:
+                    current += value
+
+                    # Find smallest prefix >= current - k
+                    target = current - k
+
+                    low = 0
+                    high = len(prefix)
+
+                    while low < high:
+                        mid = (low + high) // 2
+                        if prefix[mid] < target:
+                            low = mid + 1
+                        else:
+                            high = mid
+
+                    if low < len(prefix):
+                        result = max(result, current - prefix[low])
+
+                    # Insert current into sorted prefix
+                    prefix.insert(low if low < len(prefix) and prefix[low] >= current else len(prefix), current)
+
+                    # Keep prefix sorted
+                    prefix.sort()
+
+                    if result == k:
+                        return k
+
+        return result
