@@ -1,0 +1,35 @@
+class Solution(object):
+
+    def maxEnvelopes(self, envelopes):
+        """
+        :type envelopes: List[List[int]]
+        :rtype: int
+        """
+        if not envelopes:
+            return 0
+
+        # Sort by width ascending.
+        # If widths are equal, sort height descending.
+        envelopes.sort(key=lambda x: (x[0], -x[1]))
+
+        # Find Longest Increasing Subsequence of heights
+        dp = []
+
+        for _, height in envelopes:
+            left = 0
+            right = len(dp)
+
+            while left < right:
+                mid = (left + right) // 2
+
+                if dp[mid] < height:
+                    left = mid + 1
+                else:
+                    right = mid
+
+            if left == len(dp):
+                dp.append(height)
+            else:
+                dp[left] = height
+
+        return len(dp)
